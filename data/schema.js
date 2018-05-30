@@ -3,9 +3,9 @@ import resolvers from "./resolvers";
 
 const typeDefs = `
 type Query {
-  variables: [Variable] @cacheControl(maxAge: 5000)
-  groups: Group @cacheControl(maxAge: 5000)
-  hierarchy: Hierarchy @cacheControl(maxAge: 5000)
+  variables: [Variable]
+  groups: Group
+  hierarchy: Hierarchy
 }
 
 type Element {
@@ -21,12 +21,13 @@ type Variable {
   description: String
   methodology: String,
   enumerations: [Element]
+  group: Element
+  isVariable: Boolean
 }
 
 type Group {
   code: String
   label: String
-  variables: [Variable]
   groups: [Group]
 }
 
