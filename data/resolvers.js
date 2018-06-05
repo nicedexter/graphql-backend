@@ -29,12 +29,54 @@ const resolvers = {
         method: 'POST',
       })
         .then(res => res.json())
-        .then(json => Object.assign(
-          {},
-          json,
-          { data: JSON.stringify(json.data) }
-        ))
+        .then(json =>
+          Object.assign({}, json, { data: JSON.stringify(json.data) })
+        )
         .catch(err => console.error(err)),
+  },
+  Mutation: {
+    saveModel: (root, { variables, covariables }) => {
+      variables = variables === undefined ?  "" : variables
+      covariables = covariables === undefined ? "" : covariables
+      
+      return fetch('http://localhost:8080/services/models', {
+        body: JSON.stringify({
+          title: 'ts',
+          config: {
+            type: 'designmatrix',
+            height: 480,
+            yAxisVariables: [],
+            xAxisVariable: null,
+            hasXAxis: true,
+            title: {
+              text: 'ts',
+            },
+          },
+          dataset: {
+            code: 'DS1528208604241',
+            date: 1528208604241,
+            variable: ['leftacgganteriorcingulategyrus'],
+            grouping: [],
+            header: [],
+            data: {
+              leftacgganteriorcingulategyrus: [],
+            },
+          },
+          query: {
+            variables: variables.split(',').map(v => ({
+              code: v,
+            })),
+            groupings: [],
+            coVariables: covariables.split(',').map(v => ({
+              code: v,
+            })),
+            trainingDatasets: ['desd-synthdata'],
+          },
+        }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      }).then(res => res.text())
+    },
   },
 }
 

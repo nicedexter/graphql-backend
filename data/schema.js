@@ -1,11 +1,16 @@
-import { makeExecutableSchema, addMockFunctionsToSchema } from "graphql-tools";
-import resolvers from "./resolvers";
+import { makeExecutableSchema, addMockFunctionsToSchema } from 'graphql-tools'
+import resolvers from './resolvers'
 
 const typeDefs = `
 type Query {
   variables: [Variable]
   groups: Group
   mining(variable: String!): MiningResponse
+  
+}
+
+type Mutation {
+  saveModel(variables: String, covariables: String): String
 }
 
 type MiningResponse {
@@ -17,8 +22,12 @@ type MiningResponse {
   data: String
 }
 
+type Code {
+  code: String!
+}
+
 type Element {
-  code: String,
+  code: String
   label: String
 }
 
@@ -28,7 +37,7 @@ type Variable {
   type: String
   sql_type: String
   description: String
-  methodology: String,
+  methodology: String
   enumerations: [Element]
   group: Element
   isVariable: Boolean
@@ -39,9 +48,8 @@ type Group {
   label: String
   groups: [Group]
 }
+`
 
-`;
+const schema = makeExecutableSchema({ typeDefs, resolvers })
 
-const schema = makeExecutableSchema({ typeDefs, resolvers });
-
-export default schema;
+export default schema
