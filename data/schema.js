@@ -5,7 +5,16 @@ const typeDefs = `
 type Query {
   variables: [Variable]
   groups: Group
-  hierarchy: Hierarchy
+  mining(variable: String!): MiningResponse
+}
+
+type MiningResponse {
+  jobId: String
+  node: String
+  function: String
+  shape: String
+  timestamp: String
+  data: String
 }
 
 type Element {
@@ -29,11 +38,6 @@ type Group {
   code: String
   label: String
   groups: [Group]
-}
-
-type Hierarchy {
-   groups: [Group]
-   variables: [Variable]
 }
 
 `;
