@@ -5,12 +5,42 @@ const typeDefs = `
 type Query {
   variables: [Variable]
   groups: Group
-  mining(variable: String!): MiningResponse
-  
+  histogram(variable: String!): MiningResponse
+  summary(variables: String, grouping: String, covariables: String) : MiningResponse
+  methods: Methods
 }
 
 type Mutation {
   saveModel(variables: String, covariables: String): String
+}
+
+type ConstraintProp {
+  min_count: Int
+  binominal: Boolean
+  integer: Boolean
+  polynominal: Boolean
+  real: Boolean
+}
+
+type Constraint {
+  covariables: ConstraintProp
+  grouping: ConstraintProp
+  mixed: Boolean
+  variable: ConstraintProp
+}
+
+type Algorithm {
+  code: String!
+  label: String
+  description: String
+  type: [String]
+  constraints: Constraint
+}
+
+type Methods {
+  algorithms: [Algorithm]
+#metrics: String
+#validations: String
 }
 
 type MiningResponse {

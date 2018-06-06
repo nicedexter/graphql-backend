@@ -6,7 +6,7 @@ const resolvers = {
       fetch('http://localhost:8080/services/variables').then(res => res.json()),
     groups: () =>
       fetch('http://localhost:8080/services/groups').then(res => res.json()),
-    mining: (root, { variable }) =>
+    histogram: (root, { variable }) =>
       fetch('http://localhost:8080/services/mining', {
         body: JSON.stringify({
           variables: [{ code: variable }],
@@ -33,12 +33,49 @@ const resolvers = {
           Object.assign({}, json, { data: JSON.stringify(json.data) })
         )
         .catch(err => console.error(err)),
+
+    summary: (root, { variables, covariables, grouping }) => {
+      variables = variables === undefined ? '' : variables
+      covariables = covariables === undefined ? '' : covariables
+      grouping = grouping === undefined ? '' : grouping
+
+      return fetch('http://localhost:8080/services/mining', {
+        body: JSON.stringify({
+          variables: variables.split(',').map(v => ({
+            code: v,
+          })),
+          covariables: covariables.split(',').map(v => ({
+            code: v,
+          })),
+          grouping: grouping.split(',').map(v => ({
+            code: v,
+          })),
+          datasets: [{ code: 'desd-synthdata' }],
+          filters: '',
+          algorithm: {
+            code: 'statisticsSummary',
+            name: 'Statistics Summary',
+            parameters: [],
+            validation: false,
+          },
+        }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+        .then(res => res.json())
+        .then(json =>
+          Object.assign({}, json, { data: JSON.stringify(json.data) })
+        )
+        .catch(err => console.error(err))
+    },
+    methods: () =>
+      fetch('http://localhost:8080/services/methods').then(res => res.json()),
   },
   Mutation: {
     saveModel: (root, { variables, covariables }) => {
-      variables = variables === undefined ?  "" : variables
-      covariables = covariables === undefined ? "" : covariables
-      
+      variables = variables === undefined ? '' : variables
+      covariables = covariables === undefined ? '' : covariables
+
       return fetch('http://localhost:8080/services/models', {
         body: JSON.stringify({
           title: 'ts',
