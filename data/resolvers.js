@@ -1,64 +1,37 @@
 import fetch from 'node-fetch'
 
+const BACKEND_URL = 'http://localhost:8080/services'
+const encode = param =>
+  (param &&
+    param.split(',').map(v => ({
+      code: v,
+    }))) ||
+  []
+
 const resolvers = {
   Query: {
-    variables: () =>
-      fetch('http://localhost:8080/services/variables').then(res => res.json()),
-    groups: () =>
-      fetch('http://localhost:8080/services/groups').then(res => res.json()),
-    histogram: (root, { variable }) =>
-      fetch('http://localhost:8080/services/mining', {
-        body: JSON.stringify({
-          variables: [{ code: variable }],
-          covariables: [],
-          grouping: [
-            { code: 'dataset' },
-            { code: 'gender' },
-            { code: 'agegroup' },
-          ],
-          datasets: [{ code: 'desd-synthdata' }],
-          filters: '',
-          algorithm: {
-            code: 'histograms',
-            name: 'Histograms',
-            parameters: [],
-            validation: false,
-          },
-        }),
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-      })
-        .then(res => res.json())
-        .then(json =>
-          Object.assign({}, json, { data: JSON.stringify(json.data) })
-        )
-        .catch(err => console.error(err)),
+    variables: () => fetch(`${BACKEND_URL}/variables`).then(res => res.json()),
+    groups: () => fetch(`${BACKEND_URL}/groups`).then(res => res.json()),
+    mining: (
+      root,
+      { variables, covariables, grouping, datasets, algorithm }
+    ) => {
+      const body = {
+        variables: encode(variables),
+        covariables: encode(covariables),
+        grouping: encode(grouping),
+        datasets: encode(datasets),
+        filters: '',
+        algorithm: {
+          code: algorithm,
+          name: algorithm,
+          parameters: [],
+          validation: false,
+        },
+      }
 
-    summary: (root, { variables, covariables, grouping }) => {
-      variables = variables === undefined ? '' : variables
-      covariables = covariables === undefined ? '' : covariables
-      grouping = grouping === undefined ? '' : grouping
-
-      return fetch('http://localhost:8080/services/mining', {
-        body: JSON.stringify({
-          variables: variables.split(',').map(v => ({
-            code: v,
-          })),
-          covariables: covariables.split(',').map(v => ({
-            code: v,
-          })),
-          grouping: grouping.split(',').map(v => ({
-            code: v,
-          })),
-          datasets: [{ code: 'desd-synthdata' }],
-          filters: '',
-          algorithm: {
-            code: 'statisticsSummary',
-            name: 'Statistics Summary',
-            parameters: [],
-            validation: false,
-          },
-        }),
+      return fetch(`${BACKEND_URL}/mining`, {
+        body: JSON.stringify(body),
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
       })

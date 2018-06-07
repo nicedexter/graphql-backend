@@ -2,19 +2,21 @@ import { makeExecutableSchema, addMockFunctionsToSchema } from 'graphql-tools'
 import resolvers from './resolvers'
 
 const typeDefs = `
+
+# GraphQL root type
+
 type Query {
   variables: [Variable]
   groups: Group
-  histogram(variable: String!): MiningResponse
-  summary(variables: String, grouping: String, covariables: String) : MiningResponse
+  mining(variables: String, covariables: String, grouping: String, datasets: String, algorithm: String) : MiningResponse
   methods: Methods
-}
+ }
 
 type Mutation {
   saveModel(variables: String, covariables: String): String
 }
 
-type ConstraintProp {
+type AlgorithmConstraintProp {
   min_count: Int
   binominal: Boolean
   integer: Boolean
@@ -22,11 +24,11 @@ type ConstraintProp {
   real: Boolean
 }
 
-type Constraint {
-  covariables: ConstraintProp
-  grouping: ConstraintProp
+type AlgorithmConstraint {
+  covariables: AlgorithmConstraintProp
+  grouping: AlgorithmConstraintProp
+  variable: AlgorithmConstraintProp #FIXME variables ?
   mixed: Boolean
-  variable: ConstraintProp
 }
 
 type Algorithm {
@@ -34,13 +36,49 @@ type Algorithm {
   label: String
   description: String
   type: [String]
+  docker_image: String
+  environment: String
+  constraints: AlgorithmConstraint
+  parameters: [Parameter]
+}
+
+type Metric {
+  code: String
+  label: String
+  tooltip: String
+  type: String
+}
+
+type Metrics {
+  binominal_classification: [Metric]
+  classification: [Metric]
+  regression: [Metric]
+}
+
+type Constraint {
+  min: String
+  max: String
+}
+
+type Parameter {
+  code: String
+  label: String
+  description: String
+  default_value: String
+  type: String
   constraints: Constraint
+}
+
+type Validation {
+  code: String
+  label: String
+  parameters: [Parameter]
 }
 
 type Methods {
   algorithms: [Algorithm]
-#metrics: String
-#validations: String
+  metrics: Metrics
+  validations: [Validation]
 }
 
 type MiningResponse {
@@ -49,7 +87,7 @@ type MiningResponse {
   function: String
   shape: String
   timestamp: String
-  data: String
+  data: String # FIXME or not, stringified json for now
 }
 
 type Code {
