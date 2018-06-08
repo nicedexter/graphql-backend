@@ -10,10 +10,40 @@ type Query {
   groups: Group
   mining(variables: String, covariables: String, grouping: String, datasets: String, algorithm: String) : MiningResponse
   methods: Methods
+  getExperiments: [ExperimentResponse]
  }
 
 type Mutation {
   saveModel(variables: String, covariables: String): String
+  runExperiments(name: String, model: String, algorithms: String, datasets: String): RunExperimentResponse
+}
+
+type ExperimentResponse {
+  uuid: String
+  name: String
+  result: String
+}
+
+type ExperimentParameter { # FIXME ~ same as Parameter
+  code: String
+  value: String
+}
+
+type ExperimentAlgorithm { # FIXME should be same type as in  mining?
+  validation: Boolean
+  code: String
+  name: String
+  parameters: [ExperimentParameter]
+} 
+
+type RunExperimentResponse {
+  uuid: String
+  name: String
+  hasError: Boolean
+  hasServerError: Boolean
+  shared: Boolean
+  resultsViewed: Boolean
+  algorithms: [ExperimentAlgorithm]
 }
 
 type AlgorithmConstraintProp {

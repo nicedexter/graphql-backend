@@ -41,17 +41,18 @@ const resolvers = {
         )
         .catch(err => console.error(err))
     },
-    methods: () =>
-      fetch('http://localhost:8080/services/methods').then(res => res.json()),
+    methods: () => fetch(`${BACKEND_URL}/methods`).then(res => res.json()),
+    getExperiments: () => fetch(`${BACKEND_URL}/experiments?mine=true`).then(res => res.json()),
+
   },
   Mutation: {
     saveModel: (root, { variables, covariables }) => {
       variables = variables === undefined ? '' : variables
       covariables = covariables === undefined ? '' : covariables
 
-      return fetch('http://localhost:8080/services/models', {
+      return fetch(`${BACKEND_URL}/models`, {
         body: JSON.stringify({
-          title: 'ts',
+          title: 'test',
           config: {
             type: 'designmatrix',
             height: 480,
@@ -59,7 +60,7 @@ const resolvers = {
             xAxisVariable: null,
             hasXAxis: true,
             title: {
-              text: 'ts',
+              text: 'test',
             },
           },
           dataset: {
@@ -73,19 +74,38 @@ const resolvers = {
             },
           },
           query: {
-            variables: variables.split(',').map(v => ({
-              code: v,
-            })),
+            variables: encode(variables),
             groupings: [],
-            coVariables: covariables.split(',').map(v => ({
-              code: v,
-            })),
+            coVariables: encode(covariables),
             trainingDatasets: ['desd-synthdata'],
           },
         }),
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
       }).then(res => res.text())
+    },
+    runExperiments: (root, { name, model, algorithms, datasets }) => {
+      const body = {
+        model,
+        validations: [],
+        datasets: encode(datasets),
+        filters: '',
+        name,
+        algorithms: algorithms.split(',').map(a => ({
+          code: a,
+          name: a,
+          parameters: [],
+          validation: false,
+        })),
+      }
+
+      return fetch(`${BACKEND_URL}/experiments`, {
+        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+        .then(res => res.json())
+        .catch(err => console.error(err))
     },
   },
 }
