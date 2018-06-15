@@ -18,7 +18,15 @@ type Query {
  }
 
 type Mutation {
-  saveModel(variables: String, covariables: String): String
+  saveModel(
+    title: String
+    variables: [VariableInput!]!
+    coVariables: [VariableInput]
+    groupings: [VariableInput]
+    trainingDatasets: [VariableInput]
+    testingDatasets: [VariableInput]
+    validationDatasets: [VariableInput]
+  ): Model
   runExperiment(name: String, model: String, algorithms: String, datasets: String): Experiment
 }
 
@@ -65,8 +73,8 @@ type Experiment {
   hasServerError: Boolean
   shared: Boolean
   resultsViewed: Boolean
-  algorithms: [Algorithm]
-  validations: [Validation]
+#  algorithms: [Algorithm]
+#  validations: [String]
   model: Model
   created: String
   finished: String
@@ -82,7 +90,6 @@ type Model {
   valid: Boolean
 }
 
-
 type Algorithm {
   code: String!
   label: String
@@ -93,7 +100,7 @@ type Algorithm {
   environment: String
   constraints: AlgorithmConstraint
   parameters: [Parameter]
-  validation: Boolean
+  validation: [Validation]
 }
 
 type Parameter {
@@ -173,6 +180,13 @@ type Validation {
   label: String
   parameters: [Parameter]
 }
+
+# Input types
+
+input VariableInput {
+  code: String
+}
+
 `
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })

@@ -42,19 +42,30 @@ const resolvers = {
         .catch(err => console.error(err))
     },
     methods: () => fetch(`${BACKEND_URL}/methods`).then(res => res.json()),
-    experiments: () => fetch(`${BACKEND_URL}/experiments?mine=true`).then(res => res.json()),
-    experiment: (_, { uuid }) => fetch(`${BACKEND_URL}/experiments/${uuid}`).then(res => res.json())
-    .then(json =>
-      Object.assign({}, json, { result: JSON.stringify(json.result) })
-    )
-    .catch(err => console.error(err)),
+    experiments: () =>
+      fetch(`${BACKEND_URL}/experiments?mine=true`).then(res => res.json()),
+    experiment: (_, { uuid }) =>
+      fetch(`${BACKEND_URL}/experiments/${uuid}`)
+        .then(res => res.json())
+        .then(json =>
+          Object.assign({}, json, { result: JSON.stringify(json.result) })
+        )
+        .catch(err => console.error(err)),
     models: () => fetch(`${BACKEND_URL}/models`).then(res => res.json()),
   },
   Mutation: {
-    saveModel: (root, { variables, covariables }) => {
-      variables = variables === undefined ? '' : variables
-      covariables = covariables === undefined ? '' : covariables
-
+    saveModel: (
+      root,
+      {
+        title,
+        variables,
+        coVariables,
+        groupings,
+        trainingDatasets,
+        testingDatasets,
+        validationDatasets,
+      }
+    ) => {
       return fetch(`${BACKEND_URL}/models`, {
         body: JSON.stringify({
           title: 'test',
@@ -65,7 +76,7 @@ const resolvers = {
             xAxisVariable: null,
             hasXAxis: true,
             title: {
-              text: 'test',
+              text: title,
             },
           },
           dataset: {
@@ -79,15 +90,17 @@ const resolvers = {
             },
           },
           query: {
-            variables: encode(variables),
-            groupings: [],
-            coVariables: encode(covariables),
-            trainingDatasets: ['desd-synthdata'],
+            variables,
+            groupings,
+            coVariables,
+            trainingDatasets,
+            testingDatasets,
+            validationDatasets,
           },
         }),
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
-      }).then(res => res.text())
+      }).then(res => res.json())
     },
     runExperiment: (root, { name, model, algorithms, datasets }) => {
       const body = {
