@@ -42,8 +42,13 @@ const resolvers = {
         .catch(err => console.error(err))
     },
     methods: () => fetch(`${BACKEND_URL}/methods`).then(res => res.json()),
-    getExperiments: () => fetch(`${BACKEND_URL}/experiments?mine=true`).then(res => res.json()),
-
+    experiments: () => fetch(`${BACKEND_URL}/experiments?mine=true`).then(res => res.json()),
+    experiment: (_, { uuid }) => fetch(`${BACKEND_URL}/experiments/${uuid}`).then(res => res.json())
+    .then(json =>
+      Object.assign({}, json, { result: JSON.stringify(json.result) })
+    )
+    .catch(err => console.error(err)),
+    models: () => fetch(`${BACKEND_URL}/models`).then(res => res.json()),
   },
   Mutation: {
     saveModel: (root, { variables, covariables }) => {
@@ -84,7 +89,7 @@ const resolvers = {
         method: 'POST',
       }).then(res => res.text())
     },
-    runExperiments: (root, { name, model, algorithms, datasets }) => {
+    runExperiment: (root, { name, model, algorithms, datasets }) => {
       const body = {
         model,
         validations: [],
