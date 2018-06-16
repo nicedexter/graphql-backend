@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 
-const BACKEND_URL = 'http://localhost:8080/services'
-const encode = param =>
+const BACKEND_URL = 'http://155.105.202.23:8080/services'
+const encode = param => // FIXME: 
   (param &&
     param.split(',').map(v => ({
       code: v,
@@ -12,6 +12,7 @@ const resolvers = {
   Query: {
     variables: () => fetch(`${BACKEND_URL}/variables`).then(res => res.json()),
     groups: () => fetch(`${BACKEND_URL}/groups`).then(res => res.json()),
+    datasets: () => fetch(`${BACKEND_URL}/datasets`).then(res => res.json()),
     mining: (
       root,
       { variables, covariables, grouping, datasets, algorithm }

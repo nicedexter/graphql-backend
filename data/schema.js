@@ -10,6 +10,7 @@ const typeDefs = `
 type Query {
   variables: [Variable]
   groups: Group
+  datasets: [Dataset]
   mining(variables: String, covariables: String, grouping: String, datasets: String, algorithm: String) : Mining
   methods: Methods
   experiments: [Experiment]
@@ -48,6 +49,13 @@ type Group {
   code: String!
   label: String
   groups: [Group]
+}
+
+type Dataset {
+  code: String!
+  label: String
+  description: String
+  anonymisationLevel: String
 }
 
 type Mining {
