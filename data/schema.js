@@ -8,7 +8,7 @@ const typeDefs = `
 # GraphQL root type
 
 type Query {
-  variables: [Variable]
+  variables: [Variable]!
   groups: Group
   datasets: [Dataset]
   mining(variables: String, covariables: String, grouping: String, datasets: String, algorithm: String) : Mining
@@ -21,17 +21,20 @@ type Query {
 type Mutation {
   saveModel(
     title: String
-    variables: [VariableInput!]!
-    coVariables: [VariableInput]
+    slug: String
+    variables: [VariableInput]!
+    covariables: [VariableInput]
     groupings: [VariableInput]
-    trainingDatasets: [VariableInput]
+    filters: [VariableInput]
     testingDatasets: [VariableInput]
+    trainingDatasets: [VariableInput]
     validationDatasets: [VariableInput]
   ): Model
   runExperiment(name: String, model: String, algorithms: String, datasets: String): Experiment
 }
 
 # Types
+
 
 type Variable {
   code: String!

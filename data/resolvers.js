@@ -60,7 +60,7 @@ const resolvers = {
       {
         title,
         variables,
-        coVariables,
+        covariables,
         groupings,
         trainingDatasets,
         testingDatasets,
@@ -93,7 +93,7 @@ const resolvers = {
           query: {
             variables,
             groupings,
-            coVariables,
+            coVariables: covariables,
             trainingDatasets,
             testingDatasets,
             validationDatasets,
