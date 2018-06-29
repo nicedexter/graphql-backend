@@ -1,5 +1,12 @@
 import fetch from 'node-fetch'
-import GraphQLJSON from 'graphql-type-json'
+import { GraphQLScalarType } from 'graphql'
+
+const JSONType = new GraphQLScalarType({
+  name: 'JSON',
+  serialize(value){
+      return value;
+  }
+});
 
 const BACKEND_URL = 'http://155.105.202.23:8080/services'
 const encode = (
@@ -12,7 +19,7 @@ const encode = (
   []
 
 const resolvers = {
-  JSON: GraphQLJSON,
+  JSON: JSONType,
   Query: {
     variables: () => fetch(`${BACKEND_URL}/variables`).then(res => res.json()),
     groups: () => fetch(`${BACKEND_URL}/groups`).then(res => res.json()),
