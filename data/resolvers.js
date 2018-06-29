@@ -1,14 +1,25 @@
 import fetch from 'node-fetch'
+import { GraphQLScalarType } from 'graphql'
 
 const BACKEND_URL = 'http://155.105.202.23:8080/services'
-const encode = param => // FIXME: 
+const encode = (
+  param // FIXME:
+) =>
   (param &&
     param.split(',').map(v => ({
       code: v,
     }))) ||
   []
 
+var RawType = new GraphQLScalarType({
+  name: 'RawType',
+  serialize(value) {
+    return value
+  },
+})
+
 const resolvers = {
+  RawType,
   Query: {
     variables: () => fetch(`${BACKEND_URL}/variables`).then(res => res.json()),
     groups: () => fetch(`${BACKEND_URL}/groups`).then(res => res.json()),

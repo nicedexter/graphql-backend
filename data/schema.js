@@ -7,15 +7,18 @@ const typeDefs = `
 
 # GraphQL root type
 
+scalar RawType
+
 type Query {
   variables: [Variable]!
   groups: Group
   datasets: [Dataset]
-  mining(variables: String, covariables: String, grouping: String, datasets: String, algorithm: String) : Mining
+  mining(variables: String, covariables: String, grouping: String, datasets: String, algorithm: String) : MiningResult
   methods: Methods
-  experiments: [Experiment]
-  experiment(uuid: String): Experiment 
+  experiments: [ExperimentResult]
+  experiment(uuid: String): ExperimentResult 
   models: [Model]
+  getJSON: RawType
  }
 
 type Mutation {
@@ -30,11 +33,12 @@ type Mutation {
     trainingDatasets: [VariableInput]
     validationDatasets: [VariableInput]
   ): Model
-  runExperiment(name: String, model: String, algorithms: String, datasets: String): Experiment
+  runExperiment(name: String, model: String, algorithms: String, datasets: String): ExperimentResult
 }
 
-# Types
 
+
+# Types
 
 type Variable {
   code: String!
@@ -61,13 +65,13 @@ type Dataset {
   anonymisationLevel: String
 }
 
-type Mining {
+type MiningResult {
   jobId: String
   node: String
   function: String
   shape: String
   timestamp: String
-  data: String # FIXME: or not, stringified json for now
+  data: RawType
 }
 
 type Methods {
@@ -76,19 +80,39 @@ type Methods {
   validations: [Validation]
 }
 
-type Experiment {
+type ExperimentResult {
   uuid: String
   name: String
-  result: String
+  result: [MethodResult]
   hasError: Boolean
   hasServerError: Boolean
   shared: Boolean
   resultsViewed: Boolean
-#  algorithms: [Algorithm]
-#  validations: [String]
   model: Model
   created: String
   finished: String
+}
+
+type MethodResult {
+  timestamp: Int
+  data: [MethodData]
+  algorithmSpec: AlgorithmSpec
+  algorithm: String
+}
+
+type MethodData {
+  jobId: String
+  data: RawType
+  type: String
+  node: String
+  datasets: [Dataset]
+  training: Boolean
+  validation: Boolean
+}
+
+type AlgorithmSpec {
+  code: String!
+  parameters: [Parameter]
 }
 
 type Model {
