@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { GraphQLScalarType } from 'graphql'
+import GraphQLJSON from 'graphql-type-json'
 
 const BACKEND_URL = 'http://155.105.202.23:8080/services'
 const encode = (
@@ -11,15 +11,8 @@ const encode = (
     }))) ||
   []
 
-var RawType = new GraphQLScalarType({
-  name: 'RawType',
-  serialize(value) {
-    return value
-  },
-})
-
 const resolvers = {
-  RawType,
+  JSON: GraphQLJSON,
   Query: {
     variables: () => fetch(`${BACKEND_URL}/variables`).then(res => res.json()),
     groups: () => fetch(`${BACKEND_URL}/groups`).then(res => res.json()),
@@ -48,9 +41,7 @@ const resolvers = {
         method: 'POST',
       })
         .then(res => res.json())
-        .then(json =>
-          Object.assign({}, json, { data: JSON.stringify(json.data) })
-        )
+
         .catch(err => console.error(err))
     },
     methods: () => fetch(`${BACKEND_URL}/methods`).then(res => res.json()),
@@ -59,9 +50,6 @@ const resolvers = {
     experiment: (_, { uuid }) =>
       fetch(`${BACKEND_URL}/experiments/${uuid}`)
         .then(res => res.json())
-        .then(json =>
-          Object.assign({}, json, { result: JSON.stringify(json.result) })
-        )
         .catch(err => console.error(err)),
     models: () => fetch(`${BACKEND_URL}/models`).then(res => res.json()),
   },

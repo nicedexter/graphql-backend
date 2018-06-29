@@ -5,9 +5,9 @@ const typeDefs = `
 
 # GraphQL MIP backend implementation
 
-# GraphQL root type
+scalar JSON
 
-scalar RawType
+# GraphQL root type
 
 type Query {
   variables: [Variable]!
@@ -18,7 +18,6 @@ type Query {
   experiments: [ExperimentResult]
   experiment(uuid: String): ExperimentResult 
   models: [Model]
-  getJSON: RawType
  }
 
 type Mutation {
@@ -71,7 +70,7 @@ type MiningResult {
   function: String
   shape: String
   timestamp: String
-  data: RawType
+  data: JSON
 }
 
 type Methods {
@@ -102,7 +101,7 @@ type MethodResult {
 
 type MethodData {
   jobId: String
-  data: RawType
+  data: JSON
   type: String
   node: String
   datasets: [Dataset]
